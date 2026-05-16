@@ -168,12 +168,11 @@ The pipeline will:
 
 Potential future enhancements include:
 
-* Automated scheduling/orchestration
-* Logging framework integration
-* Error handling improvements
-* Power BI dashboard integration
+* Logging improvements
+* Error handling
+* Power BI integration
+* Scheduling/orchestration
 * Docker containerisation
-* CI/CD workflow automation
 
 ---
 
