@@ -171,6 +171,24 @@ The pipeline will:
 
 ---
 
+# Project Screenshots
+
+## BigQuery Table Schema
+
+![BigQuery Table](Screenshots/bigquery_table.png)
+
+---
+
+## BigQuery SQL Query Results
+
+![BigQuery SQL Results](Screenshots/bigquery_sql_results.png)
+
+---
+
+## Pipeline Execution
+
+![Pipeline Execution](Screenshots/pipeline_execution.png)
+
 # Future Improvements
 
 Potential future enhancements include:
