@@ -64,7 +64,6 @@ uk-energy-data-pipeline/
 │   ├── 03_sqlite_load.ipynb
 │   └── 04_bigquery_upload.ipynb
 │
-├── Outputs/
 ├── Screenshots/
 ├── SQL/
 │   └── bigquery_analysis_queries.sql
