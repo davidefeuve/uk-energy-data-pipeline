@@ -100,6 +100,22 @@ def load_to_sqlite(
         f"{database_path}"
     )
 
+def upload_to_bigquery(
+    df: pd.DataFrame,
+    credentials_path: Path
+) -> None:
+    """Upload dataset to Google BigQuery."""
+
+    client = bigquery.Client.from_service_account_json(credentials_path)
+    table_id = ("chrome-energy-496120-j4.energy_data.energy_demand")
+    job_config = bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE")
+    job = client.load_table_from_dataframe(df, table_id, job_config=job_config)
+    job.result()
+
+    print(
+        f"\nDataset uploaded successfully to BigQuery: "
+        f"{table_id}"
+    )
 
 raw_df = load_raw_data(RAW_DATA_PATH)
 
@@ -111,3 +127,4 @@ print(
 validate_data(raw_df)
 save_processed_data(raw_df, PROCESSED_DATA_PATH)
 load_to_sqlite(raw_df, SQLITE_DATABASE_PATH)
+upload_to_bigquery(raw_df, CREDENTIALS_PATH)
