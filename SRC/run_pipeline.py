@@ -6,15 +6,17 @@ This script performs the complete ETL pipeline workflow:
 1. Read raw CSV files
 2. Combine datasets
 3. Perform validation checks
-4. Save processed dataset
-5. Load data into SQLite
-6. Upload data to Google BigQuery
+4. Transform data
+5. Save processed dataset
+6. Load data into SQLite
+7. Upload data to Google BigQuery
 """
 
 import pandas as pd
 import sqlite3
 from pathlib import Path
 from google.cloud import bigquery
+
 
 # Define project paths
 RAW_DATA_PATH = Path("Data/Raw")
@@ -28,7 +30,9 @@ def load_raw_data(raw_data_path: Path) -> pd.DataFrame:
     csv_files = list(raw_data_path.glob("*.csv"))
 
     if not csv_files:
-        raise FileNotFoundError("No CSV files found in the raw data folder.")
+        raise FileNotFoundError(
+            "No CSV files found in the raw data folder."
+        )
 
     df_list = []
 
@@ -54,12 +58,40 @@ def validate_data(df: pd.DataFrame) -> None:
         print(missing_columns)
 
     duplicate_rows = df.duplicated().sum()
+
     print(f"\nDuplicate rows: {duplicate_rows}")
 
     negative_demand = (
         df["ENGLAND_WALES_DEMAND"] < 0
     ).sum()
-    print(f"Negative demand records: {negative_demand}")
+
+    print(
+        f"Negative demand records: "
+        f"{negative_demand}"
+    )
+
+def transform_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Perform basic data transformations."""
+
+    df = df.copy()
+
+    df["SETTLEMENT_DATE"] = pd.to_datetime(
+        df["SETTLEMENT_DATE"],
+        format="mixed",
+        dayfirst=True
+    )
+
+    df["DATETIME"] = (
+        df["SETTLEMENT_DATE"]
+        + pd.to_timedelta(
+            (df["SETTLEMENT_PERIOD"] - 1) * 30,
+            unit="m"
+        )
+    )
+
+    print("\nDatetime column created successfully.")
+
+    return df
 
 def save_processed_data(
     df: pd.DataFrame,
@@ -67,9 +99,14 @@ def save_processed_data(
 ) -> None:
     """Save processed dataset to CSV."""
 
-    output_path.mkdir(parents=True, exist_ok=True)
+    output_path.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
-    output_file = output_path / "combined_energy_demand.csv"
+    output_file = (
+        output_path / "combined_energy_demand.csv"
+    )
 
     df.to_csv(output_file, index=False)
 
@@ -106,10 +143,24 @@ def upload_to_bigquery(
 ) -> None:
     """Upload dataset to Google BigQuery."""
 
-    client = bigquery.Client.from_service_account_json(credentials_path)
-    table_id = ("chrome-energy-496120-j4.energy_data.energy_demand")
-    job_config = bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE")
-    job = client.load_table_from_dataframe(df, table_id, job_config=job_config)
+    client = bigquery.Client.from_service_account_json(
+        credentials_path
+    )
+
+    table_id = (
+        "chrome-energy-496120-j4.energy_data.energy_demand"
+    )
+
+    job_config = bigquery.LoadJobConfig(
+        write_disposition="WRITE_TRUNCATE"
+    )
+
+    job = client.load_table_from_dataframe(
+        df,
+        table_id,
+        job_config=job_config
+    )
+
     job.result()
 
     print(
@@ -117,14 +168,18 @@ def upload_to_bigquery(
         f"{table_id}"
     )
 
+
+# Execute pipeline
 raw_df = load_raw_data(RAW_DATA_PATH)
 
 print(
-    f"Raw data loaded successfully: {raw_df.shape[0]:,} rows "
-    f"and {raw_df.shape[1]} columns."
+    f"Raw data loaded successfully: "
+    f"{raw_df.shape[0]:,} rows and "
+    f"{raw_df.shape[1]} columns."
 )
 
 validate_data(raw_df)
-save_processed_data(raw_df, PROCESSED_DATA_PATH)
-load_to_sqlite(raw_df, SQLITE_DATABASE_PATH)
-upload_to_bigquery(raw_df, CREDENTIALS_PATH)
+processed_df = transform_data(raw_df)
+save_processed_data(processed_df, PROCESSED_DATA_PATH)
+load_to_sqlite(processed_df, SQLITE_DATABASE_PATH)
+upload_to_bigquery(processed_df, CREDENTIALS_PATH)
