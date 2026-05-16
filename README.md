@@ -45,7 +45,6 @@ Cloud SQL Analysis
 | Google BigQuery | Cloud data warehouse               |
 | SQL             | Data querying and aggregation      |
 | Git/GitHub      | Version control                    |
-| VS Code         | Development environment            |
 
 ---
 
