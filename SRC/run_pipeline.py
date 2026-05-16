@@ -6,7 +6,7 @@ This script performs the complete ETL pipeline workflow:
 1. Read raw CSV files
 2. Combine datasets
 3. Perform validation checks
-4. Transform data
+4. Transform data and create datetime features
 5. Save processed dataset
 6. Load data into SQLite
 7. Upload data to Google BigQuery

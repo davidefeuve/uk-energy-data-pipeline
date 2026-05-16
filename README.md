@@ -98,7 +98,15 @@ Validation checks include:
 * Negative demand validation
 * Dataset integrity checks
 
-## 3. Processed Data Export
+## 3. Data Transformation
+
+Transformation steps include:
+
+- Mixed-format date parsing
+- Datetime feature creation
+- Half-hour settlement period timestamp generation
+
+## 4. Processed Data Export
 
 The cleaned dataset is exported as:
 
@@ -106,7 +114,7 @@ The cleaned dataset is exported as:
 combined_energy_demand.csv
 ```
 
-## 4. SQLite Database Loading
+## 5. SQLite Database Loading
 
 The processed dataset is automatically loaded into:
 
@@ -114,7 +122,7 @@ The processed dataset is automatically loaded into:
 energy_pipeline.db
 ```
 
-## 5. BigQuery Cloud Upload
+## 6. BigQuery Cloud Upload
 
 The pipeline uploads the dataset into:
 
