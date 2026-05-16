@@ -169,7 +169,6 @@ Potential future enhancements include:
 
 * Logging improvements
 * Error handling
-* Power BI integration
 * Scheduling/orchestration
 * Docker containerisation
 
