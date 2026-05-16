@@ -201,6 +201,6 @@ Potential future enhancements include:
 
 # Author
 
-David Fernandez
+David Fernandez Victorio
 
 End-to-end ETL and cloud data engineering pipeline using Python, SQLite and Google BigQuery.
